@@ -126,11 +126,12 @@ var specialAttentionCommands = []string{"ABOR", "STAT", "QUIT"} //nolint:gocheck
 // FtpServer is where everything is stored
 // We want to keep it as simple as possible
 type FtpServer struct {
-	Logger        log.Logger   // fclairamb/go-log generic logger
-	settings      *Settings    // General settings
-	listener      net.Listener // listener used to receive files
-	clientCounter uint32       // Clients counter
-	driver        MainDriver   // Driver to handle the client authentication and the file access driver selection
+	Logger               log.Logger   // fclairamb/go-log generic logger
+	settings             *Settings    // General settings
+	listener             net.Listener // listener used to receive files
+	clientCounter        uint32       // Clients counter
+	driver               MainDriver   // Driver to handle the client authentication and the file access driver selection
+	passivePortAllocator *portAllocator
 }
 
 func (server *FtpServer) loadSettings() error {
@@ -163,6 +164,12 @@ func (server *FtpServer) loadSettings() error {
 	if settings.Banner == "" {
 		settings.Banner = "ftpserver - golang FTP server"
 	}
+
+	if settings.PassiveTransferPortRange != nil {
+		server.passivePortAllocator = newPassivePortAllocator(settings.PassiveTransferPortRange)
+	}
+
+	panic("sss")
 
 	server.settings = settings
 
